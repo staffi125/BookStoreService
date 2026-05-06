@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="${book.name}">Book</title>
+</head>
+<body>
+<main th:fragment="content">
+    <div class="container">
+        <p class="page-sub"><a th:href="@{/app/books}" th:text="#{books.back_catalog}">← Catalog</a></p>
+        <div class="detail-layout">
+            <div class="detail-body">
+                <h1 class="page-title" th:text="${book.name}">Title</h1>
+                <p class="page-sub" th:text="|${book.author} · ${book.genre} · ${book.publicationDate}|">Meta</p>
+                <p th:text="${book.description}">Description</p>
+                <p th:if="${book.characteristics}" style="color: var(--muted); font-size: 0.95rem;">
+                    <strong th:text="#{books.characteristics}">Highlights</strong>
+                    <span th:text="${book.characteristics}"></span>
+                </p>
+            </div>
+            <aside class="detail-aside">
+                <div class="price" style="font-size:1.4rem;margin-bottom:0.75rem"
+                     th:text="|${book.price} #{books.currency}|">0</div>
+                <div class="meta" th:text="#{books.pages} + ': ' + ${book.pages}">Pages</div>
+                <div class="meta" th:text="#{books.age} + ': ' + ${book.ageGroup}">Age</div>
+                <div class="meta" th:text="#{books.language} + ': ' + ${book.language}">Lang</div>
+                <form sec:authorize="hasRole('CLIENT')" class="form-grid" style="margin-top:1.25rem" th:action="@{/app/basket/add}" method="post">
+                    <input type="hidden" name="bookName" th:value="${book.name}">
+                    <div>
+                        <label for="qty" th:text="#{books.quantity}">Quantity</label>
+                        <input id="qty" type="number" name="quantity" value="1" min="1" max="99">
+                    </div>
+                    <button type="submit" class="btn btn-primary" th:text="#{books.add_basket}">Add to basket</button>
+                </form>
+                <p sec:authorize="hasRole('EMPLOYEE')" class="meta" th:text="#{books.employee_hint}">Clients add books to their basket.</p>
+            </aside>
+        </div>
+    </div>
+</main>
+</body>
+</html>

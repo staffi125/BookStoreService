@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="#{employee.dashboard.title}">Staff</title>
+</head>
+<body>
+<main th:fragment="content">
+    <div class="container">
+        <h1 class="page-title" th:text="#{employee.dashboard.title}">Staff workspace</h1>
+        <p class="page-sub" th:text="#{employee.dashboard.subtitle}">Manage inventory, clients, and incoming orders.</p>
+        <div class="card-grid">
+            <a class="card" th:href="@{/app/employee/books}" style="text-decoration:none;color:inherit">
+                <h3 th:text="#{employee.tile.books}">Books</h3>
+                <p class="meta" th:text="#{employee.tile.books.desc}">Add, edit, or remove titles.</p>
+                <span class="btn btn-secondary" th:text="#{employee.open}">Open</span>
+            </a>
+            <a class="card" th:href="@{/app/employee/clients}" style="text-decoration:none;color:inherit">
+                <h3 th:text="#{employee.tile.clients}">Clients</h3>
+                <p class="meta" th:text="#{employee.tile.clients.desc}">Block or unblock accounts.</p>
+                <span class="btn btn-secondary" th:text="#{employee.open}">Open</span>
+            </a>
+            <a class="card" th:href="@{/app/employee/orders}" style="text-decoration:none;color:inherit">
+                <h3 th:text="#{employee.tile.orders}">Orders</h3>
+                <p class="meta" th:text="#{employee.tile.orders.desc}">Confirm new orders.</p>
+                <span class="btn btn-secondary" th:text="#{employee.open}">Open</span>
+            </a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

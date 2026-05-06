@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="#{profile.title}">Profile</title>
+</head>
+<body>
+<main th:fragment="content">
+    <div class="container">
+        <h1 class="page-title" th:text="#{profile.title}">Profile</h1>
+        <p class="page-sub" th:text="#{profile.subtitle}">Keep your details up to date.</p>
+
+        <div th:if="${profileRole == 'CLIENT'}">
+            <div th:if="${clientBlocked}" class="global-error" th:text="#{profile.blocked_notice}">Blocked</div>
+            <p class="meta" th:text="|#{profile.email}: ${clientEmail}|">email</p>
+            <p class="meta" th:text="|#{profile.balance}: ${clientBalance}|">balance</p>
+            <form class="form-grid" th:action="@{/app/profile/client}" th:object="${clientProfileForm}" method="post" style="margin-top:1.5rem">
+                <div>
+                    <label for="cname" th:text="#{profile.name}">Name</label>
+                    <input id="cname" type="text" th:field="*{name}" required>
+                    <p class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+                </div>
+                <div>
+                    <label for="cpass" th:text="#{profile.new_password}">New password</label>
+                    <input id="cpass" type="password" th:field="*{password}" autocomplete="new-password"
+                           th:placeholder="#{profile.password_placeholder}">
+                    <p class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+                </div>
+                <button type="submit" class="btn btn-primary" th:text="#{common.save}">Save</button>
+            </form>
+
+            <section id="orders" style="margin-top:2.5rem">
+                <h2 class="page-title" style="font-size:1.35rem" th:text="#{profile.orders.client_title}">Your orders</h2>
+                <p class="page-sub" th:text="#{profile.orders.client_sub}">Placed from your basket.</p>
+                <div th:if="${#lists.isEmpty(clientOrders)}" class="meta" th:text="#{profile.orders.client_empty}">No orders yet.</div>
+                <div th:if="${!#lists.isEmpty(clientOrders)}" class="table-wrap">
+                    <table class="data">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th th:text="#{orders.col_staff}">Staff</th>
+                            <th th:text="#{orders.col_date}">Date</th>
+                            <th th:text="#{orders.col_total}">Total</th>
+                            <th th:text="#{orders.col_status}">Status</th>
+                            <th th:text="#{orders.col_items}">Items</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="o : ${clientOrders}">
+                            <td class="mono" th:text="${o.id}">1</td>
+                            <td th:text="${o.employeeEmail != null ? o.employeeEmail : '-'}">-</td>
+                            <td th:text="${o.orderDate}">date</td>
+                            <td th:text="${o.price}">0</td>
+                            <td>
+                                <span class="badge badge-new"
+                                      th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).NEW}"
+                                      th:text="#{orders.status.NEW}">New</span>
+                                <span class="badge badge-confirmed"
+                                      th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).CONFIRMED}"
+                                      th:text="#{orders.status.CONFIRMED}">Accepted</span>
+                                <span class="badge badge-shipped"
+                                      th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).SHIPPED}"
+                                      th:text="#{orders.status.SHIPPED}">Shipped</span>
+                                <span class="badge badge-delivered"
+                                      th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).DELIVERED}"
+                                      th:text="#{orders.status.DELIVERED}">Delivered</span>
+                                <span class="badge badge-cancelled"
+                                      th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).CANCELLED}"
+                                      th:text="#{orders.status.CANCELLED}">Cancelled</span>
+                            </td>
+                            <td>
+                                <th:block th:each="it,stat : ${o.bookItems}">
+                                    <span th:text="|${it.bookName} ×${it.quantity}|">line</span><span th:if="${!stat.last}">, </span>
+                                </th:block>
+                            </td>
+                            <td>
+                                <form class="inline-form"
+                                      th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).NEW}"
+                                      th:action="@{/app/profile/client/orders/cancel}"
+                                      method="post"
+                                      onsubmit="return confirm(this.dataset.msg);"
+                                      th:attr="data-msg=#{orders.cancel_confirm}">
+                                    <input type="hidden" name="id" th:value="${o.id}">
+                                    <button type="submit" class="btn btn-danger" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                            th:text="#{orders.cancel}">Cancel</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <div th:if="${profileRole == 'EMPLOYEE'}">
+            <p class="meta" th:text="|#{profile.email}: ${employeeEmail}|">email</p>
+            <form class="form-grid wide" th:action="@{/app/profile/employee}" th:object="${employeeProfileForm}" method="post" style="margin-top:1.5rem">
+                <div>
+                    <label for="ename" th:text="#{profile.name}">Name</label>
+                    <input id="ename" type="text" th:field="*{name}" required>
+                    <p class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+                </div>
+                <div>
+                    <label for="ebirth" th:text="#{profile.birth}">Birth date</label>
+                    <input id="ebirth" type="date" th:field="*{birthDate}" required>
+                    <p class="field-error" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}"></p>
+                </div>
+                <div>
+                    <label for="ephone" th:text="#{profile.phone}">Phone</label>
+                    <input id="ephone" type="text" th:field="*{phone}" required>
+                    <p class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></p>
+                </div>
+                <div>
+                    <label for="epass" th:text="#{profile.new_password}">New password</label>
+                    <input id="epass" type="password" th:field="*{password}" autocomplete="new-password"
+                           th:placeholder="#{profile.password_placeholder}">
+                    <p class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+                </div>
+                <button type="submit" class="btn btn-primary" th:text="#{common.save}">Save</button>
+            </form>
+
+            <section id="staff-orders" style="margin-top:2.5rem">
+                <h2 class="page-title" style="font-size:1.35rem" th:text="#{profile.orders.free_title}">Open orders</h2>
+                <p class="page-sub" th:text="#{profile.orders.free_sub}">New orders waiting for a bookseller.</p>
+                <div th:if="${#lists.isEmpty(unassignedOrders)}" class="meta" th:text="#{profile.orders.free_empty}">None.</div>
+                <div th:if="${!#lists.isEmpty(unassignedOrders)}" class="table-wrap">
+                    <table class="data">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th th:text="#{orders.col_client}">Client</th>
+                            <th th:text="#{orders.col_date}">Date</th>
+                            <th th:text="#{orders.col_total}">Total</th>
+                            <th th:text="#{orders.col_items}">Items</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="o : ${unassignedOrders}">
+                            <td class="mono" th:text="${o.id}">1</td>
+                            <td th:text="${o.clientEmail}">c</td>
+                            <td th:text="${o.orderDate}">d</td>
+                            <td th:text="${o.price}">0</td>
+                            <td>
+                                <th:block th:each="it,stat : ${o.bookItems}">
+                                    <span th:text="|${it.bookName} ×${it.quantity}|">line</span><span th:if="${!stat.last}">, </span>
+                                </th:block>
+                            </td>
+                            <td>
+                                <form class="inline-form" th:action="@{/app/profile/employee/orders/confirm}" method="post">
+                                    <input type="hidden" name="id" th:value="${o.id}">
+                                    <button type="submit" class="btn btn-primary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                            th:text="#{orders.confirm}">Confirm</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section style="margin-top:2rem">
+                <h2 class="page-title" style="font-size:1.35rem" th:text="#{profile.orders.staff_title}">My orders</h2>
+                <p class="page-sub" th:text="#{profile.orders.staff_sub}">Assigned to you.</p>
+                <div th:if="${#lists.isEmpty(staffOrders)}" class="meta" th:text="#{profile.orders.staff_empty}">None.</div>
+                <div th:if="${!#lists.isEmpty(staffOrders)}" class="table-wrap">
+                    <table class="data">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th th:text="#{orders.col_client}">Client</th>
+                            <th th:text="#{orders.col_date}">Date</th>
+                            <th th:text="#{orders.col_total}">Total</th>
+                            <th th:text="#{orders.col_status}">Status</th>
+                            <th th:text="#{orders.col_items}">Items</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="o : ${staffOrders}">
+                            <td class="mono" th:text="${o.id}">1</td>
+                            <td th:text="${o.clientEmail}">c</td>
+                            <td th:text="${o.orderDate}">d</td>
+                            <td th:text="${o.price}">0</td>
+                            <td>
+                                <span class="badge badge-new"
+                                      th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).NEW}"
+                                      th:text="#{orders.status.NEW}">New</span>
+                                <span class="badge badge-confirmed"
+                                      th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).CONFIRMED}"
+                                      th:text="#{orders.status.CONFIRMED}">Accepted</span>
+                                <span class="badge badge-shipped"
+                                      th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).SHIPPED}"
+                                      th:text="#{orders.status.SHIPPED}">Shipped</span>
+                                <span class="badge badge-delivered"
+                                      th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).DELIVERED}"
+                                      th:text="#{orders.status.DELIVERED}">Delivered</span>
+                                <span class="badge badge-cancelled"
+                                      th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).CANCELLED}"
+                                      th:text="#{orders.status.CANCELLED}">Cancelled</span>
+                            </td>
+                            <td>
+                                <th:block th:each="it,stat : ${o.bookItems}">
+                                    <span th:text="|${it.bookName} ×${it.quantity}|">line</span><span th:if="${!stat.last}">, </span>
+                                </th:block>
+                            </td>
+                            <td>
+                                <div class="btn-row" style="flex-wrap:wrap;gap:0.35rem">
+                                    <form class="inline-form"
+                                          th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).NEW}"
+                                          th:action="@{/app/profile/employee/orders/confirm}" method="post">
+                                        <input type="hidden" name="id" th:value="${o.id}">
+                                        <button type="submit" class="btn btn-primary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                                th:text="#{orders.confirm}">Confirm</button>
+                                    </form>
+                                    <form class="inline-form"
+                                          th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).CONFIRMED}"
+                                          th:action="@{/app/profile/employee/orders/ship}" method="post">
+                                        <input type="hidden" name="id" th:value="${o.id}">
+                                        <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                                th:text="#{orders.ship}">Ship</button>
+                                    </form>
+                                    <form class="inline-form"
+                                          th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).SHIPPED}"
+                                          th:action="@{/app/profile/employee/orders/deliver}" method="post">
+                                        <input type="hidden" name="id" th:value="${o.id}">
+                                        <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                                th:text="#{orders.mark_delivered}">Delivered</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+</body>
+</html>

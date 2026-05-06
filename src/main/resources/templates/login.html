@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="#{login.title}">Sign in</title>
+</head>
+<body>
+<main th:fragment="content">
+    <div class="auth-panel">
+        <div class="auth-card">
+            <h1 th:text="#{login.title}">Sign in</h1>
+            <p class="sub" th:text="#{login.subtitle}">Use your email and password.</p>
+            <div th:if="${param.registered}" class="flash flash-success" style="border-radius:8px;margin-bottom:1rem"
+                 th:text="#{register.login_hint}">Registered</div>
+            <div th:if="${param.blocked}" class="global-error" th:text="#{login.blocked}">Blocked</div>
+            <div th:if="${param.error}" class="global-error" th:text="#{login.error}">Failed</div>
+            <form class="form-grid" th:action="@{/login}" method="post">
+                <div>
+                    <label for="username" th:text="#{login.email}">Email</label>
+                    <input id="username" name="username" type="email" autocomplete="username" required>
+                </div>
+                <div>
+                    <label for="password" th:text="#{login.password}">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" th:text="#{login.submit}">Sign in</button>
+            </form>
+            <p style="margin-top:1.25rem;color:var(--muted);font-size:0.9rem">
+                <span th:text="#{login.no_account}">No account?</span>
+                <a th:href="@{/app/register}" th:text="#{nav.register}">Register</a>
+            </p>
+        </div>
+    </div>
+</main>
+</body>
+</html>

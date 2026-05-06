@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Oops! Something went wrong</title>
+</head>
+<body>
+<main th:fragment="content">
+    <div class="container" style="text-align: center; margin-top: 5rem;">
+        <h1 class="page-title" th:text="${status} + ' ' + ${error}">404 Not Found</h1>
+        
+        <p class="page-sub" th:if="${status == 404}">
+            Вибачте, сторінку, яку ви шукаєте, не знайдено або вона була переміщена.
+        </p>
+        <p class="page-sub" th:unless="${status == 404}" th:text="${message}">
+            Щось пішло не так на сервері.
+        </p>
+        
+        <p style="color: var(--text-color); opacity: 0.6; font-family: monospace; margin-top: 1rem;" th:text="${path}">
+            /app/boo
+        </p>
+
+        <div class="btn-row" style="justify-content: center; margin-top: 2rem;">
+            <a class="btn btn-primary" th:href="@{/}" th:text="#{nav.home}">На головну</a>
+            <a sec:authorize="isAuthenticated()" class="btn btn-secondary" th:href="@{/app/books}" th:text="#{nav.catalog}">До каталогу</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

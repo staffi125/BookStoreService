@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="#{employee.orders.title}">Orders</title>
+</head>
+<body>
+<main th:fragment="content">
+    <div class="container">
+        <h1 class="page-title" th:text="#{employee.orders.title}">All orders</h1>
+        <p class="page-sub"><a th:href="@{/app/employee}" th:text="#{employee.back_dashboard}">← Dashboard</a></p>
+        <div class="table-wrap">
+            <table class="data">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th th:text="#{orders.col_client}">Client</th>
+                    <th th:text="#{orders.col_staff}">Staff</th>
+                    <th th:text="#{orders.col_date}">Date</th>
+                    <th th:text="#{orders.col_total}">Total</th>
+                    <th th:text="#{orders.col_status}">Status</th>
+                    <th th:text="#{orders.col_items}">Items</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="o : ${orders}">
+                    <td class="mono" th:text="${o.id}">1</td>
+                    <td th:text="${o.clientEmail}">c</td>
+                    <td th:text="${o.employeeEmail != null ? o.employeeEmail : '-'}">e</td>
+                    <td th:text="${o.orderDate}">d</td>
+                    <td th:text="${o.price}">0</td>
+                    <td>
+                        <span class="badge badge-new"
+                              th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).NEW}"
+                              th:text="#{orders.status.NEW}">New</span>
+                        <span class="badge badge-confirmed"
+                              th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).CONFIRMED}"
+                              th:text="#{orders.status.CONFIRMED}">Accepted</span>
+                        <span class="badge badge-shipped"
+                              th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).SHIPPED}"
+                              th:text="#{orders.status.SHIPPED}">Shipped</span>
+                        <span class="badge badge-delivered"
+                              th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).DELIVERED}"
+                              th:text="#{orders.status.DELIVERED}">Delivered</span>
+                        <span class="badge badge-cancelled"
+                              th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).CANCELLED}"
+                              th:text="#{orders.status.CANCELLED}">Cancelled</span>
+                    </td>
+                    <td>
+                        <th:block th:each="it,stat : ${o.bookItems}">
+                            <span th:text="|${it.bookName} ×${it.quantity}|">line</span><span th:if="${!stat.last}">, </span>
+                        </th:block>
+                    </td>
+                    <td>
+                        <div class="btn-row" style="flex-wrap:wrap;gap:0.35rem">
+                            <form class="inline-form"
+                                  th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).NEW and (o.employeeEmail == null or o.employeeEmail == currentStaffEmail)}"
+                                  th:action="@{/app/employee/orders/confirm}"
+                                  method="post">
+                                <input type="hidden" name="id" th:value="${o.id}">
+                                <button type="submit" class="btn btn-primary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                        th:text="#{orders.confirm}">Confirm</button>
+                            </form>
+                            <form class="inline-form"
+                                  th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).CONFIRMED and o.employeeEmail == currentStaffEmail}"
+                                  th:action="@{/app/employee/orders/ship}" method="post">
+                                <input type="hidden" name="id" th:value="${o.id}">
+                                <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                        th:text="#{orders.ship}">Ship</button>
+                            </form>
+                            <form class="inline-form"
+                                  th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).SHIPPED and o.employeeEmail == currentStaffEmail}"
+                                  th:action="@{/app/employee/orders/deliver}" method="post">
+                                <input type="hidden" name="id" th:value="${o.id}">
+                                <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                        th:text="#{orders.mark_delivered}">Delivered</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

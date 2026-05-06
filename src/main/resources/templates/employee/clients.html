@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="#{employee.clients.title}">Clients</title>
+</head>
+<body>
+<main th:fragment="content">
+    <div class="container">
+        <h1 class="page-title" th:text="#{employee.clients.title}">Clients</h1>
+        <p class="page-sub"><a th:href="@{/app/employee}" th:text="#{employee.back_dashboard}">← Dashboard</a></p>
+        <div class="table-wrap">
+            <table class="data">
+                <thead>
+                <tr>
+                    <th th:text="#{employee.clients.col_email}">Email</th>
+                    <th th:text="#{employee.clients.col_name}">Name</th>
+                    <th th:text="#{employee.clients.col_balance}">Balance</th>
+                    <th th:text="#{employee.clients.col_status}">Status</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${clients}">
+                    <td class="mono" th:text="${c.email}">email</td>
+                    <td th:text="${c.name}">name</td>
+                    <td th:text="${c.balance}">0</td>
+                    <td>
+                        <span class="badge badge-blocked" th:if="${c.blocked}" th:text="#{employee.clients.blocked}">Blocked</span>
+                        <span class="badge badge-confirmed" th:if="${!c.blocked}" th:text="#{employee.clients.active}">Active</span>
+                    </td>
+                    <td>
+                        <form class="inline-form" th:if="${!c.blocked}" th:action="@{/app/employee/clients/block}" method="post">
+                            <input type="hidden" name="email" th:value="${c.email}">
+                            <button type="submit" class="btn btn-danger" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                    th:text="#{employee.clients.block}">Block</button>
+                        </form>
+                        <form class="inline-form" th:if="${c.blocked}" th:action="@{/app/employee/clients/unblock}" method="post">
+                            <input type="hidden" name="email" th:value="${c.email}">
+                            <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                    th:text="#{employee.clients.unblock}">Unblock</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

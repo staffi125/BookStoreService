@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="#{home.title}">Book Loft</title>
+</head>
+<body>
+<main th:fragment="content">
+    <div class="container">
+        <section class="hero">
+            <div>
+                <span class="pill" th:text="#{home.pill}">Curated reads</span>
+                <h1 th:text="#{home.headline}">Your next chapter starts here.</h1>
+                <p class="lead" th:text="#{home.lead}">
+                    Browse the catalog, fill your basket, and check out with a bookseller you trust.
+                </p>
+                <div class="btn-row">
+                    <a sec:authorize="!isAuthenticated()" class="btn btn-primary" th:href="@{/login}" th:text="#{home.cta_login}">Sign in</a>
+                    <a sec:authorize="!isAuthenticated()" class="btn btn-secondary" th:href="@{/app/register}" th:text="#{home.cta_register}">Create account</a>
+                    <a sec:authorize="isAuthenticated()" class="btn btn-primary" th:href="@{/app/books}" th:text="#{home.cta_shop}">Open catalog</a>
+                    <a sec:authorize="hasRole('EMPLOYEE')" class="btn btn-secondary" th:href="@{/app/employee}" th:text="#{home.cta_staff}">Staff tools</a>
+                </div>
+            </div>
+            <div class="hero-card">
+                <h3 style="font-family: var(--display); margin-top:0" th:text="#{home.card_title}">Why readers stay</h3>
+                <ul style="margin:0; padding-left:1.1rem; color: var(--muted);">
+                    <li th:text="#{home.card_1}">Warm, editorial layout</li>
+                    <li th:text="#{home.card_2}">Basket &amp; guided checkout</li>
+                    <li th:text="#{home.card_3}">Staff confirm every order</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>

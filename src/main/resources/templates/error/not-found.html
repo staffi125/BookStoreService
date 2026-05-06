@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/base :: layout(~{::title}, ~{::content})}">
+<head>
+    <title th:text="#{error.page.not_found}">Not found</title>
+</head>
+<body>
+<main th:fragment="content">
+    <div class="container">
+        <h1 class="page-title" th:text="#{error.page.not_found}">Not found</h1>
+        <p class="page-sub" th:text="${message}">Message</p>
+        <div class="btn-row">
+            <a class="btn btn-primary" th:href="@{/}" th:text="#{error.page.home}">Home</a>
+            <a sec:authorize="isAuthenticated()" class="btn btn-secondary" th:href="@{/app/books}" th:text="#{nav.catalog}">Catalog</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

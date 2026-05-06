@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="layout (pageTitle, content)"
+      th:lang="${#locale.language}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:replace="${pageTitle}">Book Store</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="site-header">
+    <div class="header-inner">
+        <a class="brand" th:href="@{/}" th:text="#{app.brand}">Book Loft</a>
+        <nav class="nav">
+            <a th:href="@{/}" th:text="#{nav.home}">Home</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/app/books}" th:text="#{nav.catalog}">Catalog</a>
+            <a sec:authorize="hasRole('CLIENT')" th:href="@{/app/basket}" th:text="#{nav.basket}">Basket</a>
+            <a sec:authorize="hasRole('EMPLOYEE')" th:href="@{/app/employee}" th:text="#{nav.staff}">Staff</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/app/profile}" th:text="#{nav.profile}">Profile</a>
+        </nav>
+        <div class="header-actions">
+            <div class="lang-switch">
+                <a th:href="@{/switch-locale(lang=en)}">EN</a>
+                <span>·</span>
+                <a th:href="@{/switch-locale(lang=uk)}">UK</a>
+            </div>
+            <a sec:authorize="!isAuthenticated()" class="btn btn-secondary" th:href="@{/login}" th:text="#{nav.login}">Log in</a>
+            <a sec:authorize="!isAuthenticated()" class="btn btn-primary" th:href="@{/app/register}" th:text="#{nav.register}">Register</a>
+            <form sec:authorize="isAuthenticated()" class="inline-form" th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-ghost" th:text="#{nav.logout}">Log out</button>
+            </form>
+        </div>
+    </div>
+</header>
+<div th:if="${flashSuccess}" class="flash flash-success" th:text="#{__${flashSuccess}__}"></div>
+<div th:if="${flashError}" class="flash flash-error" th:text="#{__${flashError}__}"></div>
+<main th:replace="${content}">
+</main>
+<footer class="site-footer" th:text="#{app.footer}">Footer</footer>
+</body>
+</html>
