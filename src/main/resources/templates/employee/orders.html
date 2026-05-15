@@ -8,10 +8,23 @@
 <body>
 <main th:fragment="content">
     <div class="container">
-        <h1 class="page-title" th:text="#{employee.orders.title}">All orders</h1>
-        <p class="page-sub"><a th:href="@{/app/employee}" th:text="#{employee.back_dashboard}">← Dashboard</a></p>
+        <header class="page-header">
+            <a class="back-link" th:href="@{/app/employee}" th:text="#{employee.back_dashboard}">Dashboard</a>
+            <h1 class="page-title" th:text="#{employee.orders.title}">All orders</h1>
+        </header>
         <div class="table-wrap">
-            <table class="data">
+            <table id="employee-orders-table" class="data"
+                   th:attr="data-staff-email=${currentStaffEmail},
+                            data-refresh-ms=30000,
+                            data-status-new=#{orders.status.NEW},
+                            data-status-confirmed=#{orders.status.CONFIRMED},
+                            data-status-shipped=#{orders.status.SHIPPED},
+                            data-status-delivered=#{orders.status.DELIVERED},
+                            data-status-cancelled=#{orders.status.CANCELLED},
+                            data-confirm-label=#{orders.confirm},
+                            data-ship-label=#{orders.ship},
+                            data-deliver-label=#{orders.mark_delivered},
+                            data-refreshed-label=#{js.orders.refreshed}">
                 <thead>
                 <tr>
                     <th>#</th>
@@ -54,27 +67,30 @@
                         </th:block>
                     </td>
                     <td>
-                        <div class="btn-row" style="flex-wrap:wrap;gap:0.35rem">
+                        <div class="table-actions">
                             <form class="inline-form"
                                   th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).NEW and (o.employeeEmail == null or o.employeeEmail == currentStaffEmail)}"
                                   th:action="@{/app/employee/orders/confirm}"
                                   method="post">
+                                <th:block th:replace="~{fragments/csrf :: token}"/>
                                 <input type="hidden" name="id" th:value="${o.id}">
-                                <button type="submit" class="btn btn-primary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                <button type="submit" class="btn btn-primary btn-sm"
                                         th:text="#{orders.confirm}">Confirm</button>
                             </form>
                             <form class="inline-form"
                                   th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).CONFIRMED and o.employeeEmail == currentStaffEmail}"
                                   th:action="@{/app/employee/orders/ship}" method="post">
+                                <th:block th:replace="~{fragments/csrf :: token}"/>
                                 <input type="hidden" name="id" th:value="${o.id}">
-                                <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                <button type="submit" class="btn btn-secondary btn-sm"
                                         th:text="#{orders.ship}">Ship</button>
                             </form>
                             <form class="inline-form"
                                   th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).SHIPPED and o.employeeEmail == currentStaffEmail}"
                                   th:action="@{/app/employee/orders/deliver}" method="post">
+                                <th:block th:replace="~{fragments/csrf :: token}"/>
                                 <input type="hidden" name="id" th:value="${o.id}">
-                                <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                <button type="submit" class="btn btn-secondary btn-sm"
                                         th:text="#{orders.mark_delivered}">Delivered</button>
                             </form>
                         </div>
@@ -84,6 +100,7 @@
             </table>
         </div>
     </div>
+    <script th:src="@{/js/employee-orders.js}" defer></script>
 </main>
 </body>
 </html>

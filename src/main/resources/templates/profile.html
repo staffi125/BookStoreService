@@ -8,14 +8,26 @@
 <body>
 <main th:fragment="content">
     <div class="container">
-        <h1 class="page-title" th:text="#{profile.title}">Profile</h1>
-        <p class="page-sub" th:text="#{profile.subtitle}">Keep your details up to date.</p>
+        <header class="page-header">
+            <h1 class="page-title" th:text="#{profile.title}">Profile</h1>
+            <p class="page-sub" th:text="#{profile.subtitle}">Keep your details up to date.</p>
+        </header>
 
         <div th:if="${profileRole == 'CLIENT'}">
-            <div th:if="${clientBlocked}" class="global-error" th:text="#{profile.blocked_notice}">Blocked</div>
-            <p class="meta" th:text="|#{profile.email}: ${clientEmail}|">email</p>
-            <p class="meta" th:text="|#{profile.balance}: ${clientBalance}|">balance</p>
-            <form class="form-grid" th:action="@{/app/profile/client}" th:object="${clientProfileForm}" method="post" style="margin-top:1.5rem">
+            <div th:if="${clientBlocked}" class="alert-banner alert-banner--warn" th:text="#{profile.blocked_notice}">Blocked</div>
+            <div class="stat-grid">
+                <div class="stat-chip">
+                    <span class="stat-chip__label" th:text="#{profile.email}">Email</span>
+                    <span class="stat-chip__value" th:text="${clientEmail}">email</span>
+                </div>
+                <div class="stat-chip stat-chip--balance">
+                    <span class="stat-chip__label" th:text="#{profile.balance}">Balance</span>
+                    <span class="stat-chip__value" th:text="${clientBalance}">0</span>
+                </div>
+            </div>
+            <div class="form-panel">
+            <form class="form-grid" th:action="@{/app/profile/client}" th:object="${clientProfileForm}" method="post">
+                <th:block th:replace="~{fragments/csrf :: token}"/>
                 <div>
                     <label for="cname" th:text="#{profile.name}">Name</label>
                     <input id="cname" type="text" th:field="*{name}" required>
@@ -29,11 +41,17 @@
                 </div>
                 <button type="submit" class="btn btn-primary" th:text="#{common.save}">Save</button>
             </form>
+            </div>
 
-            <section id="orders" style="margin-top:2.5rem">
-                <h2 class="page-title" style="font-size:1.35rem" th:text="#{profile.orders.client_title}">Your orders</h2>
-                <p class="page-sub" th:text="#{profile.orders.client_sub}">Placed from your basket.</p>
-                <div th:if="${#lists.isEmpty(clientOrders)}" class="meta" th:text="#{profile.orders.client_empty}">No orders yet.</div>
+            <section id="orders" class="section-panel">
+                <div class="section-panel__head">
+                    <h2 class="section-title" th:text="#{profile.orders.client_title}">Your orders</h2>
+                    <p class="page-sub" th:text="#{profile.orders.client_sub}">Placed from your basket.</p>
+                </div>
+                <div th:if="${#lists.isEmpty(clientOrders)}" class="empty-state">
+                    <div class="empty-state__icon" aria-hidden="true"></div>
+                    <p th:text="#{profile.orders.client_empty}">No orders yet.</p>
+                </div>
                 <div th:if="${!#lists.isEmpty(clientOrders)}" class="table-wrap">
                     <table class="data">
                         <thead>
@@ -82,8 +100,9 @@
                                       method="post"
                                       onsubmit="return confirm(this.dataset.msg);"
                                       th:attr="data-msg=#{orders.cancel_confirm}">
+                                    <th:block th:replace="~{fragments/csrf :: token}"/>
                                     <input type="hidden" name="id" th:value="${o.id}">
-                                    <button type="submit" class="btn btn-danger" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                    <button type="submit" class="btn btn-danger btn-sm"
                                             th:text="#{orders.cancel}">Cancel</button>
                                 </form>
                             </td>
@@ -95,8 +114,15 @@
         </div>
 
         <div th:if="${profileRole == 'EMPLOYEE'}">
-            <p class="meta" th:text="|#{profile.email}: ${employeeEmail}|">email</p>
-            <form class="form-grid wide" th:action="@{/app/profile/employee}" th:object="${employeeProfileForm}" method="post" style="margin-top:1.5rem">
+            <div class="stat-grid">
+                <div class="stat-chip">
+                    <span class="stat-chip__label" th:text="#{profile.email}">Email</span>
+                    <span class="stat-chip__value" th:text="${employeeEmail}">email</span>
+                </div>
+            </div>
+            <div class="form-panel">
+            <form class="form-grid wide" th:action="@{/app/profile/employee}" th:object="${employeeProfileForm}" method="post">
+                <th:block th:replace="~{fragments/csrf :: token}"/>
                 <div>
                     <label for="ename" th:text="#{profile.name}">Name</label>
                     <input id="ename" type="text" th:field="*{name}" required>
@@ -120,11 +146,17 @@
                 </div>
                 <button type="submit" class="btn btn-primary" th:text="#{common.save}">Save</button>
             </form>
+            </div>
 
-            <section id="staff-orders" style="margin-top:2.5rem">
-                <h2 class="page-title" style="font-size:1.35rem" th:text="#{profile.orders.free_title}">Open orders</h2>
-                <p class="page-sub" th:text="#{profile.orders.free_sub}">New orders waiting for a bookseller.</p>
-                <div th:if="${#lists.isEmpty(unassignedOrders)}" class="meta" th:text="#{profile.orders.free_empty}">None.</div>
+            <section id="staff-orders" class="section-panel">
+                <div class="section-panel__head">
+                    <h2 class="section-title" th:text="#{profile.orders.free_title}">Open orders</h2>
+                    <p class="page-sub" th:text="#{profile.orders.free_sub}">New orders waiting for a bookseller.</p>
+                </div>
+                <div th:if="${#lists.isEmpty(unassignedOrders)}" class="empty-state">
+                    <div class="empty-state__icon" aria-hidden="true"></div>
+                    <p th:text="#{profile.orders.free_empty}">None.</p>
+                </div>
                 <div th:if="${!#lists.isEmpty(unassignedOrders)}" class="table-wrap">
                     <table class="data">
                         <thead>
@@ -150,8 +182,9 @@
                             </td>
                             <td>
                                 <form class="inline-form" th:action="@{/app/profile/employee/orders/confirm}" method="post">
+                                    <th:block th:replace="~{fragments/csrf :: token}"/>
                                     <input type="hidden" name="id" th:value="${o.id}">
-                                    <button type="submit" class="btn btn-primary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                    <button type="submit" class="btn btn-primary btn-sm"
                                             th:text="#{orders.confirm}">Confirm</button>
                                 </form>
                             </td>
@@ -161,10 +194,15 @@
                 </div>
             </section>
 
-            <section style="margin-top:2rem">
-                <h2 class="page-title" style="font-size:1.35rem" th:text="#{profile.orders.staff_title}">My orders</h2>
-                <p class="page-sub" th:text="#{profile.orders.staff_sub}">Assigned to you.</p>
-                <div th:if="${#lists.isEmpty(staffOrders)}" class="meta" th:text="#{profile.orders.staff_empty}">None.</div>
+            <section class="section-panel">
+                <div class="section-panel__head">
+                    <h2 class="section-title" th:text="#{profile.orders.staff_title}">My orders</h2>
+                    <p class="page-sub" th:text="#{profile.orders.staff_sub}">Assigned to you.</p>
+                </div>
+                <div th:if="${#lists.isEmpty(staffOrders)}" class="empty-state">
+                    <div class="empty-state__icon" aria-hidden="true"></div>
+                    <p th:text="#{profile.orders.staff_empty}">None.</p>
+                </div>
                 <div th:if="${!#lists.isEmpty(staffOrders)}" class="table-wrap">
                     <table class="data">
                         <thead>
@@ -207,10 +245,11 @@
                                 </th:block>
                             </td>
                             <td>
-                                <div class="btn-row" style="flex-wrap:wrap;gap:0.35rem">
+                                <div class="table-actions">
                                     <form class="inline-form"
                                           th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).NEW}"
                                           th:action="@{/app/profile/employee/orders/confirm}" method="post">
+                                        <th:block th:replace="~{fragments/csrf :: token}"/>
                                         <input type="hidden" name="id" th:value="${o.id}">
                                         <button type="submit" class="btn btn-primary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
                                                 th:text="#{orders.confirm}">Confirm</button>
@@ -218,15 +257,17 @@
                                     <form class="inline-form"
                                           th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).CONFIRMED}"
                                           th:action="@{/app/profile/employee/orders/ship}" method="post">
+                                        <th:block th:replace="~{fragments/csrf :: token}"/>
                                         <input type="hidden" name="id" th:value="${o.id}">
-                                        <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                        <button type="submit" class="btn btn-secondary btn-sm"
                                                 th:text="#{orders.ship}">Ship</button>
                                     </form>
                                     <form class="inline-form"
                                           th:if="${o.status == T(com.spring.project.model.enums.OrderStatus).SHIPPED}"
                                           th:action="@{/app/profile/employee/orders/deliver}" method="post">
+                                        <th:block th:replace="~{fragments/csrf :: token}"/>
                                         <input type="hidden" name="id" th:value="${o.id}">
-                                        <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                        <button type="submit" class="btn btn-secondary btn-sm"
                                                 th:text="#{orders.mark_delivered}">Delivered</button>
                                     </form>
                                 </div>

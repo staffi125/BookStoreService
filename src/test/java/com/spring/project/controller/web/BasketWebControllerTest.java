@@ -15,15 +15,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(BasketWebController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class BasketWebControllerTest {
+class BasketWebControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -38,9 +43,10 @@ public class BasketWebControllerTest {
     private OrderService orderService;
 
     @Test
-    @WithMockUser(roles = "CLIENT")
+    @WithMockUser(username = "client@example.com", roles = "CLIENT")
     void testViewBasket_EmptyBasket() throws Exception {
-        when(basketService.getItems(any())).thenReturn(Collections.emptyList());
+        doNothing().when(basketService).mergeSessionBasket(any(), eq("client@example.com"));
+        when(basketService.getItems("client@example.com")).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/app/basket").session(new MockHttpSession()))
                 .andExpect(status().isOk())
@@ -49,37 +55,34 @@ public class BasketWebControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "CLIENT")
+    @WithMockUser(username = "client@example.com", roles = "CLIENT")
     void testAddToBasket() throws Exception {
-        doNothing().when(basketService).addItem(any(), any(), any(int.class));
-        when(basketService.getItems(any())).thenReturn(Collections.emptyList());
+        doNothing().when(basketService).addItem(eq("client@example.com"), eq("Book1"), anyInt());
 
         mockMvc.perform(post("/app/basket/add")
-                .session(new MockHttpSession())
-                .param("bookName", "Book1")
-                .param("quantity", "2"))
+                        .param("bookName", "Book1")
+                        .param("quantity", "2"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/app/basket"));
     }
 
     @Test
-    @WithMockUser(roles = "CLIENT")
+    @WithMockUser(username = "client@example.com", roles = "CLIENT")
     void testClearBasket() throws Exception {
-        doNothing().when(basketService).clear(any());
+        doNothing().when(basketService).clear("client@example.com");
 
-        mockMvc.perform(post("/app/basket/clear").session(new MockHttpSession()))
+        mockMvc.perform(post("/app/basket/clear"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/app/basket"));
     }
 
     @Test
-    @WithMockUser(roles = "CLIENT")
+    @WithMockUser(username = "client@example.com", roles = "CLIENT")
     void testRemoveFromBasket() throws Exception {
-        doNothing().when(basketService).removeItem(any(), any());
+        doNothing().when(basketService).removeItem("client@example.com", "Book1");
 
         mockMvc.perform(post("/app/basket/remove")
-                .session(new MockHttpSession())
-                .param("bookName", "Book1"))
+                        .param("bookName", "Book1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/app/basket"));
     }

@@ -1,7 +1,6 @@
 package com.spring.project.service;
 
 import com.spring.project.dto.OrderDTO;
-import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 
@@ -31,7 +30,7 @@ public interface OrderService {
      */
     OrderDTO cancelOrderByClient(Long id, String clientEmail);
 
-    OrderDTO checkoutFromBasket(HttpSession session, String clientEmail);
+    OrderDTO checkoutFromBasket(String clientEmail);
 
     List<OrderDTO> getAllOrders();
 

@@ -6,6 +6,7 @@ import com.spring.project.exception.NotFoundException;
 import com.spring.project.model.Client;
 import com.spring.project.repo.ClientRepository;
 import com.spring.project.service.ClientService;
+import com.spring.project.util.EmailNormalizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -59,6 +60,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ClientDTO addClient(ClientDTO client) {
+        client.setEmail(EmailNormalizer.normalize(client.getEmail()));
         if (clientRepository.findByEmail(client.getEmail()).isPresent()) {
             throw new AlreadyExistException("Client already exists: " + client.getEmail());
         }

@@ -6,12 +6,27 @@
     <title th:text="#{books.list.title}">Catalog</title>
 </head>
 <body>
-<main th:fragment="content">
+<main th:fragment="content" id="catalog-root"
+      th:attr="data-client-mode=${#authorization.expression('hasRole(''CLIENT'')')} ? 'true' : 'false',
+               data-pages-label=#{books.list.page_count('{0}')},
+               data-currency=#{books.currency},
+               data-view-label=#{books.view},
+               data-add-label=#{books.add_basket},
+               data-empty-label=#{books.search.empty},
+               data-page-status=#{books.page.status},
+               data-page-indicator=#{books.page.indicator},
+               data-prev-label=#{books.page.prev},
+               data-next-label=#{books.page.next},
+               data-error-label=#{js.catalog.error},
+               data-added-label=#{basket.added},
+               data-add-error-label=#{js.basket.error}">
     <div class="container">
-        <h1 class="page-title" th:text="#{books.list.title}">Catalog</h1>
-        <p class="page-sub" th:text="#{books.list.subtitle}">Pick a title to see details and add to your basket.</p>
+        <header class="page-header">
+            <h1 class="page-title" th:text="#{books.list.title}">Catalog</h1>
+            <p class="page-sub" th:text="#{books.list.subtitle}">Pick a title to see details and add to your basket.</p>
+        </header>
 
-        <form class="book-toolbar" th:action="@{/app/books}" method="get">
+        <form id="catalog-filter-form" class="book-toolbar" th:action="@{/app/books}" method="get">
             <div class="book-toolbar-row">
                 <label class="sr-only" for="book-q" th:text="#{books.search.placeholder}">Search</label>
                 <input id="book-q" type="search" name="q" th:value="${q}"
@@ -41,25 +56,28 @@
             </div>
         </form>
 
-        <p class="meta book-page-meta" th:if="${bookPage.totalElements > 0}"
+        <p class="meta book-page-meta" id="catalog-meta" th:if="${bookPage.totalElements > 0}"
            th:text="#{books.page.status(${bookPage.number + 1}, ${bookPage.totalPages}, ${bookPage.totalElements})}">
             Page info
         </p>
-        <p class="meta" th:if="${bookPage.totalElements == 0}" th:text="#{books.search.empty}">No books</p>
+        <p class="meta" id="catalog-meta-empty" th:if="${bookPage.totalElements == 0}" th:text="#{books.search.empty}">No books</p>
 
-        <div class="card-grid" th:if="${bookPage.totalElements > 0}">
+        <div class="card-grid" id="book-grid" th:if="${bookPage.totalElements > 0}">
             <article class="card" th:each="book : ${bookPage.content}">
+                <div class="card-cover" aria-hidden="true"></div>
                 <h3 th:text="${book.name}">Title</h3>
                 <div class="meta" th:text="|${book.author} · ${book.genre}|">Author</div>
                 <div class="meta" th:if="${book.pages != null}" th:text="#{books.list.page_count(${book.pages})}">320 pages</div>
                 <div class="price" th:text="|${book.price} #{books.currency}|">0.00</div>
                 <div class="btn-row" style="margin-top:auto">
                     <a class="btn btn-secondary" th:href="@{/app/books/detail(name=${book.name})}" th:text="#{books.view}">View</a>
+                    <button type="button" class="btn btn-primary js-catalog-quick-add" sec:authorize="hasRole('CLIENT')"
+                            th:attr="data-book=${book.name}" th:text="#{books.add_basket}">Add</button>
                 </div>
             </article>
         </div>
 
-        <nav class="pager" th:if="${bookPage.totalPages > 1}">
+        <nav class="pager" id="catalog-pager" th:if="${bookPage.totalPages > 1}">
             <a class="btn btn-secondary"
                th:if="${bookPage.hasPrevious()}"
                th:href="@{/app/books(q=${q},page=${bookPage.number - 1},minPrice=${minPrice},maxPrice=${maxPrice},minPages=${minPages},maxPages=${maxPages})}"
@@ -71,6 +89,7 @@
                th:text="#{books.page.next}">Next</a>
         </nav>
     </div>
+    <script th:src="@{/js/catalog.js}" defer></script>
 </main>
 </body>
 </html>

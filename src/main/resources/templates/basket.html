@@ -6,15 +6,20 @@
     <title th:text="#{basket.title}">Basket</title>
 </head>
 <body>
-<main th:fragment="content">
+<main th:fragment="content" class="page-basket">
     <div class="container">
-        <h1 class="page-title" th:text="#{basket.title}">Basket</h1>
-        <p class="page-sub" th:text="#{basket.subtitle}">Review lines and place your order.</p>
-        <div th:if="${basketEmpty}" class="hero-card" style="max-width:480px">
+        <header class="page-header">
+            <h1 class="page-title" th:text="#{basket.title}">Basket</h1>
+            <p class="page-sub" th:text="#{basket.subtitle}">Review lines and place your order.</p>
+        </header>
+
+        <div th:if="${basketEmpty}" class="empty-state">
+            <div class="empty-state__icon" aria-hidden="true"></div>
             <p th:text="#{basket.empty}">Empty</p>
             <a class="btn btn-primary" th:href="@{/app/books}" th:text="#{basket.go_catalog}">Catalog</a>
         </div>
-        <div th:if="${!basketEmpty}">
+
+        <div th:if="${!basketEmpty}" class="surface-panel">
             <div class="table-wrap">
                 <table class="data">
                     <thead>
@@ -28,33 +33,39 @@
                     </thead>
                     <tbody>
                     <tr th:each="line : ${lines}">
-                        <td th:text="${line.bookName}">Book</td>
+                        <td><strong th:text="${line.bookName}">Book</strong></td>
                         <td th:text="${line.quantity}">1</td>
                         <td th:text="${line.unitPrice}">0</td>
-                        <td th:text="${line.lineTotal}">0</td>
+                        <td class="price" th:text="${line.lineTotal}">0</td>
                         <td>
                             <form class="inline-form" th:action="@{/app/basket/remove}" method="post">
+                                <th:block th:replace="~{fragments/csrf :: token}"/>
                                 <input type="hidden" name="bookName" th:value="${line.bookName}">
-                                <button type="submit" class="btn btn-ghost" style="font-size:0.85rem" th:text="#{basket.remove}">Remove</button>
+                                <button type="submit" class="btn btn-ghost btn-sm" th:text="#{basket.remove}">Remove</button>
                             </form>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-            <p class="page-sub" style="margin-top:1rem">
-                <strong th:text="#{basket.grand_total}">Total</strong>
-                <span th:text="${basketTotal}">0</span>
-            </p>
-            <div class="btn-row" style="margin-top:1rem">
-                <form class="inline-form" th:action="@{/app/basket/checkout}" method="post">
-                    <button type="submit" class="btn btn-primary" th:text="#{basket.place_order}">Place order</button>
-                </form>
-                <form class="inline-form" th:action="@{/app/basket/clear}" method="post">
-                    <button type="submit" class="btn btn-secondary" th:text="#{basket.clear}">Clear</button>
-                </form>
+
+            <div class="summary-bar">
+                <div>
+                    <span class="summary-bar__label" th:text="#{basket.grand_total}">Total</span>
+                    <span class="summary-bar__total" th:text="${basketTotal}">0</span>
+                </div>
+                <div class="btn-row">
+                    <form class="inline-form" th:action="@{/app/basket/checkout}" method="post">
+                        <th:block th:replace="~{fragments/csrf :: token}"/>
+                        <button type="submit" class="btn btn-primary" th:text="#{basket.place_order}">Place order</button>
+                    </form>
+                    <form class="inline-form" th:action="@{/app/basket/clear}" method="post">
+                        <th:block th:replace="~{fragments/csrf :: token}"/>
+                        <button type="submit" class="btn btn-secondary" th:text="#{basket.clear}">Clear</button>
+                    </form>
+                </div>
             </div>
-            <p class="meta" style="margin-top:0.75rem" th:text="#{basket.order_hint}">Orders appear in your profile.</p>
+            <p class="meta" style="margin-top:1rem;margin-bottom:0" th:text="#{basket.order_hint}">Orders appear in your profile.</p>
         </div>
     </div>
 </main>

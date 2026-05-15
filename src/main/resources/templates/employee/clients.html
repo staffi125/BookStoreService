@@ -8,8 +8,10 @@
 <body>
 <main th:fragment="content">
     <div class="container">
-        <h1 class="page-title" th:text="#{employee.clients.title}">Clients</h1>
-        <p class="page-sub"><a th:href="@{/app/employee}" th:text="#{employee.back_dashboard}">← Dashboard</a></p>
+        <header class="page-header">
+            <a class="back-link" th:href="@{/app/employee}" th:text="#{employee.back_dashboard}">Dashboard</a>
+            <h1 class="page-title" th:text="#{employee.clients.title}">Clients</h1>
+        </header>
         <div class="table-wrap">
             <table class="data">
                 <thead>
@@ -32,13 +34,15 @@
                     </td>
                     <td>
                         <form class="inline-form" th:if="${!c.blocked}" th:action="@{/app/employee/clients/block}" method="post">
+                            <th:block th:replace="~{fragments/csrf :: token}"/>
                             <input type="hidden" name="email" th:value="${c.email}">
-                            <button type="submit" class="btn btn-danger" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                            <button type="submit" class="btn btn-danger btn-sm"
                                     th:text="#{employee.clients.block}">Block</button>
                         </form>
                         <form class="inline-form" th:if="${c.blocked}" th:action="@{/app/employee/clients/unblock}" method="post">
+                            <th:block th:replace="~{fragments/csrf :: token}"/>
                             <input type="hidden" name="email" th:value="${c.email}">
-                            <button type="submit" class="btn btn-secondary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                            <button type="submit" class="btn btn-secondary btn-sm"
                                     th:text="#{employee.clients.unblock}">Unblock</button>
                         </form>
                     </td>

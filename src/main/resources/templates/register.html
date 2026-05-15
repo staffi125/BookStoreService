@@ -6,36 +6,49 @@
     <title th:text="#{register.title}">Register</title>
 </head>
 <body>
-<main th:fragment="content">
-    <div class="auth-panel">
+<main th:fragment="content" class="page-auth">
+    <div class="auth-panel auth-panel--split">
+        <div class="auth-side">
+            <h2 class="auth-side__title" th:text="#{register.title}">Create account</h2>
+            <p class="auth-side__text" th:text="#{register.subtitle}">Join as a client to shop the catalog.</p>
+        </div>
         <div class="auth-card">
             <h1 th:text="#{register.title}">Create account</h1>
             <p class="sub" th:text="#{register.subtitle}">Join as a client to shop the catalog.</p>
-            <form class="form-grid" th:action="@{/app/register}" th:object="${registerForm}" method="post">
+            <form id="register-form" class="form-grid" th:action="@{/app/register}" th:object="${registerForm}" method="post"
+                  th:attr="data-email-required=#{js.register.email.required},
+                           data-email-invalid=#{js.register.email.invalid},
+                           data-password-required=#{js.register.password.required},
+                           data-password-invalid=#{ValidPassword.message},
+                           data-name-invalid=#{js.register.name.invalid},
+                           data-form-invalid=#{js.register.form.invalid}">
+                <th:block th:replace="~{fragments/csrf :: token}"/>
                 <div th:if="${#fields.hasGlobalErrors()}" class="global-error" th:text="#{register.duplicate}"></div>
                 <div>
                     <label for="email" th:text="#{register.email}">Email</label>
-                    <input id="email" type="email" th:field="*{email}" required>
-                    <p class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+                    <input id="email" type="email" th:field="*{email}" required autocomplete="email">
+                    <p class="field-error" data-error-for="email" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
                 </div>
                 <div>
                     <label for="password" th:text="#{register.password}">Password</label>
                     <input id="password" type="password" th:field="*{password}" required autocomplete="new-password">
-                    <p class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+                    <p class="field-hint" th:text="#{js.register.password.hint}"></p>
+                    <p class="field-error" data-error-for="password" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
                 </div>
                 <div>
                     <label for="name" th:text="#{register.name}">Name</label>
                     <input id="name" type="text" th:field="*{name}" required>
-                    <p class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+                    <p class="field-error" data-error-for="name" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
                 </div>
                 <input type="hidden" th:field="*{balance}" />
                 <button type="submit" class="btn btn-primary" th:text="#{register.submit}">Create</button>
             </form>
-            <p style="margin-top:1.25rem;color:var(--muted);font-size:0.9rem">
+            <p class="auth-footnote">
                 <a th:href="@{/login}" th:text="#{register.have_account}">Already registered?</a>
             </p>
         </div>
     </div>
+    <script th:src="@{/js/register.js}" defer></script>
 </main>
 </body>
 </html>

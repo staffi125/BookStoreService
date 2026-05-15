@@ -6,16 +6,20 @@
     <title th:text="#{login.title}">Sign in</title>
 </head>
 <body>
-<main th:fragment="content">
-    <div class="auth-panel">
+<main th:fragment="content" class="page-auth">
+    <div class="auth-panel auth-panel--split">
+        <div class="auth-side">
+            <h2 class="auth-side__title" th:text="#{app.brand}">Book Loft</h2>
+            <p class="auth-side__text" th:text="#{home.lead}">Browse the catalog and order with confidence.</p>
+        </div>
         <div class="auth-card">
             <h1 th:text="#{login.title}">Sign in</h1>
             <p class="sub" th:text="#{login.subtitle}">Use your email and password.</p>
-            <div th:if="${param.registered}" class="flash flash-success" style="border-radius:8px;margin-bottom:1rem"
-                 th:text="#{register.login_hint}">Registered</div>
+            <div th:if="${param.registered}" class="flash flash-success flash-inline" th:text="#{register.login_hint}">Registered</div>
             <div th:if="${param.blocked}" class="global-error" th:text="#{login.blocked}">Blocked</div>
             <div th:if="${param.error}" class="global-error" th:text="#{login.error}">Failed</div>
             <form class="form-grid" th:action="@{/login}" method="post">
+                <th:block th:replace="~{fragments/csrf :: token}"/>
                 <div>
                     <label for="username" th:text="#{login.email}">Email</label>
                     <input id="username" name="username" type="email" autocomplete="username" required>
@@ -26,7 +30,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary" th:text="#{login.submit}">Sign in</button>
             </form>
-            <p style="margin-top:1.25rem;color:var(--muted);font-size:0.9rem">
+            <p class="auth-footnote">
                 <span th:text="#{login.no_account}">No account?</span>
                 <a th:href="@{/app/register}" th:text="#{nav.register}">Register</a>
             </p>

@@ -8,6 +8,7 @@ import com.spring.project.model.Employee;
 import com.spring.project.repo.ClientRepository;
 import com.spring.project.repo.EmployeeRepository;
 import com.spring.project.service.EmployeeService;
+import com.spring.project.util.EmailNormalizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -61,6 +62,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDTO addEmployee(EmployeeDTO employee) {
+        employee.setEmail(EmailNormalizer.normalize(employee.getEmail()));
         if (employeeRepository.findByEmail(employee.getEmail()).isPresent()) {
             throw new AlreadyExistException("Employee already exists: " + employee.getEmail());
         }

@@ -8,12 +8,17 @@
 <body>
 <main th:fragment="content">
     <div class="container">
-        <h1 class="page-title" th:text="#{employee.books.title}">Book inventory</h1>
-        <p class="page-sub">
-            <a th:href="@{/app/employee}" th:text="#{employee.back_dashboard}">← Dashboard</a>
-            ·
-            <a class="btn btn-primary" style="display:inline-flex;margin-left:0.5rem" th:href="@{/app/employee/books/new}" th:text="#{employee.books.new}">New book</a>
-        </p>
+        <header class="page-header">
+            <div class="page-header__row">
+                <div>
+                    <a class="back-link" th:href="@{/app/employee}" th:text="#{employee.back_dashboard}">Dashboard</a>
+                    <h1 class="page-title" th:text="#{employee.books.title}">Book inventory</h1>
+                </div>
+                <div class="page-header__actions">
+                    <a class="btn btn-primary" th:href="@{/app/employee/books/new}" th:text="#{employee.books.new}">New book</a>
+                </div>
+            </div>
+        </header>
 
         <form class="book-toolbar" th:action="@{/app/employee/books}" method="get">
             <div class="book-toolbar-row">
@@ -65,14 +70,15 @@
                     <td th:text="${b.genre}">Genre</td>
                     <td th:text="${b.price}">0</td>
                     <td>
-                        <div class="btn-row">
-                            <a class="btn btn-secondary" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                        <div class="table-actions">
+                            <a class="btn btn-secondary btn-sm"
                                th:href="@{/app/employee/books/edit(name=${b.name})}" th:text="#{common.edit}">Edit</a>
                             <form class="inline-form" th:action="@{/app/employee/books/delete}" method="post"
                                   onsubmit="return confirm(this.dataset.msg);"
                                   th:attr="data-msg=#{employee.books.delete_confirm}">
+                                <th:block th:replace="~{fragments/csrf :: token}"/>
                                 <input type="hidden" name="name" th:value="${b.name}">
-                                <button type="submit" class="btn btn-danger" style="font-size:0.85rem;padding:0.35rem 0.75rem"
+                                <button type="submit" class="btn btn-danger btn-sm"
                                         th:text="#{common.delete}">Delete</button>
                             </form>
                         </div>

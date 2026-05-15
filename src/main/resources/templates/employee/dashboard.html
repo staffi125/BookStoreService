@@ -8,20 +8,25 @@
 <body>
 <main th:fragment="content">
     <div class="container">
-        <h1 class="page-title" th:text="#{employee.dashboard.title}">Staff workspace</h1>
-        <p class="page-sub" th:text="#{employee.dashboard.subtitle}">Manage inventory, clients, and incoming orders.</p>
+        <header class="page-header">
+            <h1 class="page-title" th:text="#{employee.dashboard.title}">Staff workspace</h1>
+            <p class="page-sub" th:text="#{employee.dashboard.subtitle}">Manage inventory, clients, and incoming orders.</p>
+        </header>
         <div class="card-grid">
-            <a class="card" th:href="@{/app/employee/books}" style="text-decoration:none;color:inherit">
+            <a class="card card--link" th:href="@{/app/employee/books}">
+                <div class="card-cover" aria-hidden="true"><span class="tile-icon tile-icon--books"></span></div>
                 <h3 th:text="#{employee.tile.books}">Books</h3>
                 <p class="meta" th:text="#{employee.tile.books.desc}">Add, edit, or remove titles.</p>
                 <span class="btn btn-secondary" th:text="#{employee.open}">Open</span>
             </a>
-            <a class="card" th:href="@{/app/employee/clients}" style="text-decoration:none;color:inherit">
+            <a class="card card--link" th:href="@{/app/employee/clients}">
+                <div class="card-cover" aria-hidden="true"><span class="tile-icon tile-icon--clients"></span></div>
                 <h3 th:text="#{employee.tile.clients}">Clients</h3>
                 <p class="meta" th:text="#{employee.tile.clients.desc}">Block or unblock accounts.</p>
                 <span class="btn btn-secondary" th:text="#{employee.open}">Open</span>
             </a>
-            <a class="card" th:href="@{/app/employee/orders}" style="text-decoration:none;color:inherit">
+            <a class="card card--link" th:href="@{/app/employee/orders}">
+                <div class="card-cover" aria-hidden="true"><span class="tile-icon tile-icon--orders"></span></div>
                 <h3 th:text="#{employee.tile.orders}">Orders</h3>
                 <p class="meta" th:text="#{employee.tile.orders.desc}">Confirm new orders.</p>
                 <span class="btn btn-secondary" th:text="#{employee.open}">Open</span>

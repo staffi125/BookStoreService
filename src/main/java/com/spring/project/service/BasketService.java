@@ -7,11 +7,16 @@ import java.util.List;
 
 public interface BasketService {
 
-    void addItem(HttpSession session, String bookName, int quantity);
+    void addItem(String clientEmail, String bookName, int quantity);
 
-    void removeItem(HttpSession session, String bookName);
+    void removeItem(String clientEmail, String bookName);
 
-    void clear(HttpSession session);
+    void clear(String clientEmail);
 
-    List<BookItemDTO> getItems(HttpSession session);
+    List<BookItemDTO> getItems(String clientEmail);
+
+    /**
+     * One-time import of items stored in the HTTP session before the basket was persisted in the database.
+     */
+    void mergeSessionBasket(HttpSession session, String clientEmail);
 }

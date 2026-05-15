@@ -1,5 +1,3 @@
--- Seed passwords: BCrypt (cost 10), plaintext for every seeded user is "password123".
--- Verified by SeedBcryptHashesMatchTest (Spring BCryptPasswordEncoder).
 
 INSERT INTO EMPLOYEES (BIRTH_DATE, EMAIL, NAME, PASSWORD, PHONE)
 VALUES ('1990-05-15', 'john.doe@email.com', 'John Doe', '$2a$10$kypbnGGCpJ7UQlysnqzJG.6H.dUewn7UPVWA3Ip.E.8U4jlVnFNnu', '555-123-4567'),

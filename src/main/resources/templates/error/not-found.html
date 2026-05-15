@@ -6,11 +6,12 @@
     <title th:text="#{error.page.not_found}">Not found</title>
 </head>
 <body>
-<main th:fragment="content">
-    <div class="container">
+<main th:fragment="content" class="page-error">
+    <div class="container error-page">
+        <p class="error-code">404</p>
         <h1 class="page-title" th:text="#{error.page.not_found}">Not found</h1>
         <p class="page-sub" th:text="${message}">Message</p>
-        <div class="btn-row">
+        <div class="btn-row" style="justify-content:center;margin-top:2rem">
             <a class="btn btn-primary" th:href="@{/}" th:text="#{error.page.home}">Home</a>
             <a sec:authorize="isAuthenticated()" class="btn btn-secondary" th:href="@{/app/books}" th:text="#{nav.catalog}">Catalog</a>
         </div>

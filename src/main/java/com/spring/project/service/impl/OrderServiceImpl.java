@@ -15,7 +15,6 @@ import com.spring.project.repo.EmployeeRepository;
 import com.spring.project.repo.OrderRepository;
 import com.spring.project.service.BasketService;
 import com.spring.project.service.OrderService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -194,8 +193,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO checkoutFromBasket(HttpSession session, String clientEmail) {
-        List<BookItemDTO> lines = basketService.getItems(session);
+    public OrderDTO checkoutFromBasket(String clientEmail) {
+        List<BookItemDTO> lines = basketService.getItems(clientEmail);
         if (lines.isEmpty()) {
             throw new IllegalStateException("Basket is empty");
         }
@@ -212,7 +211,7 @@ public class OrderServiceImpl implements OrderService {
         order.setPrice(total);
         order.setBookItems(new ArrayList<>(lines));
         OrderDTO saved = orderServiceSelf.getObject().addOrder(order);
-        basketService.clear(session);
+        basketService.clear(clientEmail);
         log.info("Checkout completed client={} orderId={} lines={} total={}",
                 clientEmail, saved.getId(), lines.size(), total);
         return saved;

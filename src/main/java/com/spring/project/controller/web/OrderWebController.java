@@ -1,7 +1,9 @@
 package com.spring.project.controller.web;
 
+import com.spring.project.dto.OrderDTO;
 import com.spring.project.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,7 +14,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/app")
@@ -39,6 +44,13 @@ public class OrderWebController {
         model.addAttribute("orders", orderService.getAllOrders());
         model.addAttribute("currentStaffEmail", principal.getUsername());
         return "employee/orders";
+    }
+
+    @GetMapping(value = "/employee/orders/data", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @ResponseBody
+    public List<OrderDTO> employeeOrdersData() {
+        return orderService.getAllOrders();
     }
 
     @PostMapping("/employee/orders/confirm")

@@ -13,7 +13,6 @@ import com.spring.project.repo.ClientRepository;
 import com.spring.project.repo.EmployeeRepository;
 import com.spring.project.repo.OrderRepository;
 import com.spring.project.service.impl.OrderServiceImpl;
-import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,8 +41,6 @@ public class OrderServiceImplTest {
     @Mock private BasketService basketService;
     @Mock private ModelMapper modelMapper;
     @Mock private ObjectProvider<OrderService> orderServiceSelf;
-    @Mock private HttpSession session;
-    
     @InjectMocks
     private OrderServiceImpl orderService;
 
@@ -156,7 +153,7 @@ public class OrderServiceImplTest {
         book.setName("Book1");
         book.setPrice(BigDecimal.valueOf(50));
 
-        when(basketService.getItems(session)).thenReturn(List.of(itemDto));
+        when(basketService.getItems("c@email.com")).thenReturn(List.of(itemDto));
         when(bookRepository.findByName("Book1")).thenReturn(Optional.of(book));
         
         // Use spy to bypass actual addOrder execution which relies on actual client
@@ -164,9 +161,9 @@ public class OrderServiceImplTest {
         when(orderServiceSelf.getObject()).thenReturn(spyService);
         doReturn(new OrderDTO()).when(spyService).addOrder(any(OrderDTO.class));
         
-        spyService.checkoutFromBasket(session, "c@email.com");
-        
-        verify(basketService).clear(session);
+        spyService.checkoutFromBasket("c@email.com");
+
+        verify(basketService).clear("c@email.com");
         verify(spyService).addOrder(argThat(o -> o.getPrice().compareTo(BigDecimal.valueOf(100)) == 0));
     }
 }

@@ -19,14 +19,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.ignoringRequestMatchers(
+                        "/books/**",
+                        "/clients/**",
+                        "/employees/**",
+                        "/orders/**",
+                        "/profile",
+                        "/profile/**",
+                        "/basket/**"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/css/**", "/js/**", "/login", "/error").permitAll()
                         .requestMatchers("/switch-locale").permitAll()
                         .requestMatchers("/logout").permitAll()
                         .requestMatchers("/app/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/app/register").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/clients").permitAll()
                         .requestMatchers("/app/**").authenticated()
                         .requestMatchers("/books/**").authenticated()
@@ -47,7 +53,6 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/")
                         .permitAll());
 
-        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
         return http.build();
     }
 

@@ -2,7 +2,6 @@ package com.spring.project.controller;
 
 import com.spring.project.dto.OrderDTO;
 import com.spring.project.service.OrderService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,10 +40,8 @@ public class OrderController {
 
     @PostMapping("/checkout")
     @PreAuthorize("hasRole('CLIENT')")
-    public OrderDTO checkout(
-            @AuthenticationPrincipal UserDetails principal,
-            HttpSession session) {
-        return orderService.checkoutFromBasket(session, principal.getUsername());
+    public OrderDTO checkout(@AuthenticationPrincipal UserDetails principal) {
+        return orderService.checkoutFromBasket(principal.getUsername());
     }
 
     @PutMapping("/{id}/confirm")

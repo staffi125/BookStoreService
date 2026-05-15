@@ -9,22 +9,25 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BasketController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class BasketControllerTest {
+class BasketControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -36,37 +39,36 @@ public class BasketControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(roles = "CLIENT")
+    @WithMockUser(username = "client@example.com", roles = "CLIENT")
     void testGetBasket() throws Exception {
         BookItemDTO item = new BookItemDTO("Test Book", 2);
-        when(basketService.getItems(any())).thenReturn(List.of(item));
+        when(basketService.getItems("client@example.com")).thenReturn(List.of(item));
 
-        mockMvc.perform(get("/basket").session(new MockHttpSession()))
+        mockMvc.perform(get("/basket"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].bookName").value("Test Book"))
                 .andExpect(jsonPath("$[0].quantity").value(2));
     }
 
     @Test
-    @WithMockUser(roles = "CLIENT")
+    @WithMockUser(username = "client@example.com", roles = "CLIENT")
     void testAddItem() throws Exception {
         BookItemDTO item = new BookItemDTO("Test Book", 1);
-        when(basketService.getItems(any())).thenReturn(List.of(item));
+        when(basketService.getItems("client@example.com")).thenReturn(List.of(item));
 
         mockMvc.perform(post("/basket/items")
-                .session(new MockHttpSession())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(item)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(item)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].bookName").value("Test Book"));
     }
 
     @Test
-    @WithMockUser(roles = "CLIENT")
+    @WithMockUser(username = "client@example.com", roles = "CLIENT")
     void testClearBasket() throws Exception {
-        doNothing().when(basketService).clear(any());
+        doNothing().when(basketService).clear("client@example.com");
 
-        mockMvc.perform(delete("/basket").session(new MockHttpSession()))
+        mockMvc.perform(delete("/basket"))
                 .andExpect(status().isOk());
     }
 }
