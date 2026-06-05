@@ -6,7 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Ensures SQL seed passwords in sql/sql.sql match BCrypt hashes (cost 10, Spring-compatible).
+ * Ensures Liquibase seed passwords match BCrypt hashes (cost 10, Spring-compatible).
  * Demo login for all seeded rows: email from data + plaintext {@value #SEED_PLAINTEXT_PASSWORD}.
  */
 class SeedBcryptHashesMatchTest {
@@ -14,7 +14,7 @@ class SeedBcryptHashesMatchTest {
     static final String SEED_PLAINTEXT_PASSWORD = "password123";
 
     /**
-     * Same BCrypt string is used for every PASSWORD value in sql/sql.sql seed inserts.
+     * Same BCrypt string is used for every PASSWORD value in Liquibase seed (002-seed-data.sql).
      * BCrypt for {@value #SEED_PLAINTEXT_PASSWORD} (cost factor 10).
      */
     static final String SEED_BCRYPT_HASH =
@@ -24,6 +24,6 @@ class SeedBcryptHashesMatchTest {
     void seedHashMatchesPassword123() {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         assertTrue(encoder.matches(SEED_PLAINTEXT_PASSWORD, SEED_BCRYPT_HASH),
-                "Update SEED_BCRYPT_HASH in sql/sql.sql or adjust password to match encoder output");
+                "Update SEED_BCRYPT_HASH in 002-seed-data.sql or adjust password to match encoder output");
     }
 }

@@ -1,0 +1,240 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-initial-schema
+      author: book-store
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: books
+      changes:
+        - createTable:
+            tableName: employees
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_employees
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_employees_email
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: birth_date
+                  type: DATE
+              - column:
+                  name: phone
+                  type: VARCHAR(255)
+
+        - createTable:
+            tableName: clients
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_clients
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_clients_email
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: balance
+                  type: DECIMAL(19, 2)
+              - column:
+                  name: blocked
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: books
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_books
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: genre
+                  type: VARCHAR(255)
+              - column:
+                  name: age_group
+                  type: VARCHAR(255)
+              - column:
+                  name: price
+                  type: DECIMAL(19, 2)
+              - column:
+                  name: publication_year
+                  type: DATE
+              - column:
+                  name: author
+                  type: VARCHAR(255)
+              - column:
+                  name: number_of_pages
+                  type: INT
+              - column:
+                  name: characteristics
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+              - column:
+                  name: language
+                  type: VARCHAR(255)
+
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_orders
+                    nullable: false
+              - column:
+                  name: client_id
+                  type: BIGINT
+              - column:
+                  name: employee_id
+                  type: BIGINT
+              - column:
+                  name: order_date
+                  type: TIMESTAMP
+              - column:
+                  name: price
+                  type: DECIMAL(19, 2)
+              - column:
+                  name: order_status
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: book_items
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_book_items
+                    nullable: false
+              - column:
+                  name: quantity
+                  type: INT
+              - column:
+                  name: book_id
+                  type: BIGINT
+              - column:
+                  name: order_id
+                  type: BIGINT
+
+        - createTable:
+            tableName: basket_entries
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_basket_entries
+                    nullable: false
+              - column:
+                  name: client_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: book_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quantity
+                  type: INT
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: basket_entries
+            columnNames: client_id, book_id
+            constraintName: uk_basket_client_book
+
+        - addForeignKeyConstraint:
+            baseTableName: orders
+            baseColumnNames: client_id
+            referencedTableName: clients
+            referencedColumnNames: id
+            constraintName: fk_orders_client
+
+        - addForeignKeyConstraint:
+            baseTableName: orders
+            baseColumnNames: employee_id
+            referencedTableName: employees
+            referencedColumnNames: id
+            constraintName: fk_orders_employee
+
+        - addForeignKeyConstraint:
+            baseTableName: book_items
+            baseColumnNames: book_id
+            referencedTableName: books
+            referencedColumnNames: id
+            constraintName: fk_book_items_book
+
+        - addForeignKeyConstraint:
+            baseTableName: book_items
+            baseColumnNames: order_id
+            referencedTableName: orders
+            referencedColumnNames: id
+            constraintName: fk_book_items_order
+
+        - addForeignKeyConstraint:
+            baseTableName: basket_entries
+            baseColumnNames: client_id
+            referencedTableName: clients
+            referencedColumnNames: id
+            constraintName: fk_basket_entries_client
+
+        - addForeignKeyConstraint:
+            baseTableName: basket_entries
+            baseColumnNames: book_id
+            referencedTableName: books
+            referencedColumnNames: id
+            constraintName: fk_basket_entries_book

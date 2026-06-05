@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-seed-data
+      author: book-store
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT COUNT(*) FROM books
+      changes:
+        - sqlFile:
+            path: 002-seed-data.sql
+            relativeToChangelogFile: true
+            stripComments: true
